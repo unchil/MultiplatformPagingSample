@@ -1,4 +1,4 @@
-The sample source for app.cash.paging.Pager has been forked and modified from cashapp/multiplatform-paging.
+The sample source for app.cash.paging.Pager has been forked and modified from [GitHub Repository Search sample project][sample link]
 
 This is a Kotlin Multiplatform project targeting Android, iOS, Desktop, Server.
 
@@ -19,3 +19,6 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Desktop, Server.
 
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+
+[sample link]: https://github.com/unchil/multiplatform-paging/tree/main-3.3.0-alpha02/samples/repo-search "Go GitHub Repository Search sample project"
