@@ -8,7 +8,6 @@ import app.cash.paging.PagingSourceLoadResult
 import app.cash.paging.PagingSourceLoadResultError
 import app.cash.paging.PagingSourceLoadResultPage
 import app.cash.paging.PagingState
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpHeaders
@@ -21,9 +20,7 @@ import kotlinx.coroutines.flow.map
 
 class RepoSearchPresenter {
 
-    private val httpClient = getClient()
     private var latestSearchTerm = ""
-
 
     private val pager: Pager<Int, Repository> = run {
 
@@ -34,11 +31,10 @@ class RepoSearchPresenter {
         }
 
         Pager(pagingConfig) {
-            RepositoryPagingSource(httpClient, latestSearchTerm)
+            RepositoryPagingSource(latestSearchTerm)
         }
 
     }
-
 
     val transformViewModel: ( Flow<Event>) ->  Flow<ViewModel> = {
         it.map { event ->
@@ -55,76 +51,77 @@ class RepoSearchPresenter {
         }
     }
 
+}
 
-    private class RepositoryPagingSource(
-        private val httpClient: HttpClient,
-        private val searchTerm: String,
-    ) : PagingSource<Int, Repository>() {
 
-        override suspend fun load(params: PagingSourceLoadParams<Int>): PagingSourceLoadResult<Int, Repository> {
-            val page = params.key ?: FIRST_PAGE_INDEX
-            val httpResponse = httpClient.get("https://api.github.com/search/repositories") {
-                url {
-                    parameters.append("page", page.toString())
-                    parameters.append("per_page", params.loadSize.toString())
-                    parameters.append("sort", "stars")
-                    parameters.append("q", searchTerm)
-                }
 
-                headers {
-                    append(HttpHeaders.Accept, "application/vnd.github.v3+json")
-                }
+class RepositoryPagingSource(
+    private val searchTerm: String,
+) : PagingSource<Int, Repository>() {
 
+    private val httpClient = getClient()
+
+    override suspend fun load(params: PagingSourceLoadParams<Int>): PagingSourceLoadResult<Int, Repository> {
+        val page = params.key ?: FIRST_PAGE_INDEX
+        val httpResponse = httpClient.get("https://api.github.com/search/repositories") {
+            url {
+                parameters.append("page", page.toString())
+                parameters.append("per_page", params.loadSize.toString())
+                parameters.append("sort", "stars")
+                parameters.append("q", searchTerm)
             }
-            return when {
 
-                httpResponse.status.isSuccess() -> {
+            headers {
+                append(HttpHeaders.Accept, "application/vnd.github.v3+json")
+            }
 
-                    try {
-                        httpResponse.let {
-                            val repositories = it.body<Repositories>()
-                            PagingSourceLoadResultPage(
-                                data = repositories.items,
-                                prevKey = (page - 1).takeIf {
-                                    it >= FIRST_PAGE_INDEX
-                                },
-                                nextKey = if (repositories.items.isNotEmpty()) page + 1 else null,
-                            ) as PagingSourceLoadResult<Int, Repository>
-                        }
+        }
+        return when {
 
-                    } catch(e: Exception){
-                        PagingSourceLoadResultError<Int, Repository>(
-                            Exception("Received a ${httpResponse.status}."),
+            httpResponse.status.isSuccess() -> {
+
+                try {
+                    httpResponse.let {
+                        val repositories = it.body<Repositories>()
+                        PagingSourceLoadResultPage(
+                            data = repositories.items,
+                            prevKey = (page - 1).takeIf {
+                                it >= FIRST_PAGE_INDEX
+                            },
+                            nextKey = if (repositories.items.isNotEmpty()) page + 1 else null,
                         ) as PagingSourceLoadResult<Int, Repository>
-
                     }
 
-                }
-
-                httpResponse.status == HttpStatusCode.Forbidden -> {
-                    PagingSourceLoadResultError<Int, Repository>(
-                        Exception("Whoops! You just exceeded the GitHub API rate limit."),
-                    ) as PagingSourceLoadResult<Int, Repository>
-                }
-
-                else -> {
+                } catch(e: Exception){
                     PagingSourceLoadResultError<Int, Repository>(
                         Exception("Received a ${httpResponse.status}."),
                     ) as PagingSourceLoadResult<Int, Repository>
+
                 }
+
             }
-        }
 
-        override fun getRefreshKey(state: PagingState<Int, Repository>): Int? = null
+            httpResponse.status == HttpStatusCode.Forbidden -> {
+                PagingSourceLoadResultError<Int, Repository>(
+                    Exception("Whoops! You just exceeded the GitHub API rate limit."),
+                ) as PagingSourceLoadResult<Int, Repository>
+            }
 
-        companion object {
-            /**
-             * The GitHub REST API uses [1-based page numbering](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#pagination).
-             */
-            const val FIRST_PAGE_INDEX = 1
+            else -> {
+                PagingSourceLoadResultError<Int, Repository>(
+                    Exception("Received a ${httpResponse.status}."),
+                ) as PagingSourceLoadResult<Int, Repository>
+            }
         }
     }
 
+    override fun getRefreshKey(state: PagingState<Int, Repository>): Int? = null
 
-
+    companion object {
+        /**
+         * The GitHub REST API uses [1-based page numbering](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#pagination).
+         */
+        const val FIRST_PAGE_INDEX = 1
+    }
 }
+
