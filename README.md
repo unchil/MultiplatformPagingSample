@@ -1,4 +1,4 @@
-The code of RepoSearchPresenter is modified based on [GitHub Repository Search sample project][sample link]
+The code of RepoSearchPresenter, RepoSearchContent is modified based on [GitHub Repository Search sample project][sample link]
 
 This is a Kotlin Multiplatform project targeting Android, iOS, Desktop, Server.
 
