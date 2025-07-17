@@ -74,55 +74,37 @@ fun RepoSearchContent(
     when (viewModel) {
         ViewModel.Empty -> {
             Scaffold(
-                topBar = {
-                    SearchTextField(
-                        actionHandler = onEvent,
-                        onRefreshList = {}
-                    )
-                },
-                content = {},
                 modifier = modifier,
-                bottomBar = {
-                    GridProgressIndicator(isVisibility = isVisibleFooter.value)
-                },
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState)
-                },
-                floatingActionButton = {
-                    UpButton(listState = listState, coroutineScope = coroutineScope)
-                }
+                topBar = { SearchTextField(actionHandler = onEvent) },
+                bottomBar = { GridProgressIndicator(isVisibility = isVisibleFooter.value) },
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                floatingActionButton = { UpButton(listState = listState, coroutineScope = coroutineScope) },
+                content = {}
             )
         }
 
         is ViewModel.SearchResults -> {
+
             val repositories = viewModel.repositories.collectAsLazyPagingItems()
 
             Scaffold(
-                topBar = {
-                    SearchTextField(
-                        actionHandler = onEvent,
-                        onRefreshList = {repositories.refresh()}
-                    )
-                },
-                content = {
-                    SearchResults(
-                        repositories,
-                        isVisibleFooter,
-                        listState = listState,
-                        snackbarHostState = snackbarHostState
-                    )
-                },
                 modifier = modifier,
-                bottomBar = {
-                    GridProgressIndicator(isVisibility = isVisibleFooter.value)
-                },
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState)
-                },
-                floatingActionButton = {
-                    UpButton(listState = listState, coroutineScope = coroutineScope)
-                }
-            )
+                topBar = { SearchTextField(
+                    actionHandler = onEvent,
+                    onRefreshList = {repositories.refresh()},
+                    searchTerm = viewModel.searchTerm
+                )},
+                bottomBar = { GridProgressIndicator(isVisibility = isVisibleFooter.value) },
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                floatingActionButton = { UpButton(listState = listState, coroutineScope = coroutineScope) }
+            ){ paddingValues ->
+                SearchResults(
+                    repositories,
+                    isVisibleFooter,
+                    listState = listState,
+                    snackbarHostState = snackbarHostState
+                )
+            }
         }
     }
 
@@ -259,10 +241,12 @@ fun UpButton(listState: LazyGridState,  coroutineScope: CoroutineScope){
 @Composable
 fun SearchTextField(
     actionHandler: (Event) -> Unit,
-    onRefreshList: () -> Unit,
+    onRefreshList: (() -> Unit)? = null,
+    searchTerm:String = ""
+
 ) {
 
-    var title by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf(searchTerm) }
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -280,7 +264,7 @@ fun SearchTextField(
                 title.trim().let {
                     if (it.isNotEmpty()) {
                         actionHandler(Event.SearchTerm(searchTerm = it))
-                        onRefreshList()
+                        onRefreshList?.invoke()
                     }
                 }
                 keyboardController?.hide()
