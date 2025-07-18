@@ -9,6 +9,8 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import java.awt.Desktop
+import java.net.URI
 
 class JVMPlatform: Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"
@@ -42,3 +44,15 @@ actual fun getClient(): HttpClient =  HttpClient {
     }
 }
 
+actual fun openUrlInBrowser(url: String, context:Any?) {
+    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        try {
+            Desktop.getDesktop().browse(URI(url))
+        } catch (e: Exception) {
+            System.err.println("Failed to open URL in browser: $url, Error: ${e.message}")
+            e.printStackTrace()
+        }
+    } else {
+        System.err.println("Desktop BROWSE action is not supported on this platform.")
+    }
+}

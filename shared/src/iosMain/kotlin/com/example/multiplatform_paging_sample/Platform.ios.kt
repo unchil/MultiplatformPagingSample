@@ -9,6 +9,8 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
 import platform.UIKit.UIDevice
 
 class IOSPlatform: Platform {
@@ -38,5 +40,14 @@ actual fun getClient(): HttpClient =  HttpClient {
         requestTimeoutMillis = 10000
         connectTimeoutMillis = 3000
         socketTimeoutMillis = 3000
+    }
+}
+
+actual fun openUrlInBrowser(url: String, context:Any?) {
+    val nsUrl = NSURL(string = url)
+    UIApplication.sharedApplication.openURL(nsUrl, options = emptyMap<Any?, Any?>()) { success ->
+        if (!success) {
+            println("Failed to open URL in iOS browser: $url")
+        }
     }
 }

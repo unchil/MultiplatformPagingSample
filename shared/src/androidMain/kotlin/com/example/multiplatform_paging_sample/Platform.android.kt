@@ -1,11 +1,16 @@
 package com.example.multiplatform_paging_sample
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+
 
 class AndroidPlatform : Platform {
     override val name: String = "Android ${Build.VERSION.SDK_INT}"
@@ -31,4 +36,16 @@ actual fun getClient(): HttpClient =  HttpClient {
         connectTimeoutMillis = 3000
         socketTimeoutMillis = 3000
     }
+}
+
+actual fun openUrlInBrowser(url: String, context: Any?) {
+    context?.let {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        try {
+            (it as Context).startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 }

@@ -41,6 +41,8 @@ kotlin {
 
         jvmMain.dependencies {
             implementation(libs.ktor.client.cio)
+
+
         }
 
 
