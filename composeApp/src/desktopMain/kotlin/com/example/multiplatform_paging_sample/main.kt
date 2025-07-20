@@ -8,7 +8,14 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "MultiplatformPagingSample",
     ) {
-       // AppPagingSample()
-        App()
+
+        AppPagingSample(
+            onExploreItemClicked= {
+                    repositories ->
+                openUrlInBrowser(repositories.html_url)
+
+            }
+        )
+
     }
 }

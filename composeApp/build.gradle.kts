@@ -1,5 +1,3 @@
-import groovy.lang.Closure
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -12,14 +10,13 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
 
-
 }
 
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
     
@@ -33,8 +30,10 @@ kotlin {
             isStatic = true
         }
     }
-    
+
+
     jvm("desktop")
+
     
     sourceSets {
         val desktopMain by getting
@@ -68,9 +67,11 @@ kotlin {
 
             implementation(libs.paging.testing)
         }
+
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+
         }
 
         iosMain.dependencies {
@@ -102,8 +103,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
@@ -112,6 +113,7 @@ dependencies {
 }
 
 compose.desktop {
+
     application {
         mainClass = "com.example.multiplatform_paging_sample.MainKt"
 
@@ -120,5 +122,10 @@ compose.desktop {
             packageName = "com.example.multiplatform_paging_sample"
             packageVersion = "1.0.0"
         }
+
+
+
     }
+
+
 }

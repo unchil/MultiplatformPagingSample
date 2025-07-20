@@ -65,6 +65,7 @@ fun RepoSearchContent(
     viewModel: ViewModel,
     onEvent: (Event) -> Unit,
     modifier: Modifier = Modifier,
+    onExploreItemClicked : OnExploreItemClicked
 ) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyGridState()
@@ -102,7 +103,8 @@ fun RepoSearchContent(
                     repositories,
                     isVisibleFooter,
                     listState = listState,
-                    snackbarHostState = snackbarHostState
+                    snackbarHostState = snackbarHostState,
+                    onExploreItemClicked = onExploreItemClicked
                 )
             }
         }
@@ -117,12 +119,13 @@ fun SearchResults(
     repositories: LazyPagingItems<Repository>,
     isVisibleFooter: MutableState<Boolean>,
     listState: LazyGridState,
-    snackbarHostState:SnackbarHostState
+    snackbarHostState:SnackbarHostState,
+    onExploreItemClicked : OnExploreItemClicked
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-
     val topBarVerticalDp = 80.dp
+
 
     when (repositories.loadState.refresh) {
         is LoadState.NotLoading -> {
@@ -136,6 +139,7 @@ fun SearchResults(
                     items(repositories.itemCount) {
                         repositories[it]?.let {
                             ItemCard(
+                                onExploreItemClicked = onExploreItemClicked,
                                 item = it
                             )
                         }
@@ -280,10 +284,11 @@ fun SearchTextField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemCard(
+    onExploreItemClicked: OnExploreItemClicked,
     item:Repository){
 
     Card(
-        onClick = { } ,
+        onClick = { onExploreItemClicked(item)} ,
         modifier = Modifier,
         colors = CardDefaults.cardColors(
             containerColor = Color.White

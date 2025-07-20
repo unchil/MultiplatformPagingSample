@@ -4,7 +4,7 @@ import app.cash.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
-
+typealias OnExploreItemClicked = (Repository) -> Unit
 sealed interface Event {
 
     data class SearchTerm(
