@@ -1,6 +1,6 @@
 The code of RepoSearchPresenter, RepoSearchContent is modified based on [GitHub Repository Search sample project][sample link]
 
-
+How to implement platform-specific native views in compose (using GoogleMap as an example)
 
 This is a Kotlin Multiplatform project targeting Android, iOS, Desktop, Server.
 
