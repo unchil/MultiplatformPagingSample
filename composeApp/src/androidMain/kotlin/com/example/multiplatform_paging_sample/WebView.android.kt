@@ -11,22 +11,17 @@ import androidx.compose.ui.viewinterop.AndroidView
 @Composable
 actual fun WebView(modifier: Modifier, url: String) {
 
-  //  openUrlInBrowser(url, LocalContext.current)
-
     AndroidView(
-        modifier = modifier,
         factory = { context ->
-
             WebView(context).apply {
                 settings.javaScriptEnabled = true
                 webViewClient = WebViewClient()
-                loadUrl(url)
             }
-
         },
         update = { webView ->
             webView.loadUrl(url)
-        }
+        },
+        modifier = modifier
     )
 
 }
