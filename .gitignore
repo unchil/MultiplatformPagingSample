@@ -7,3 +7,4 @@
 /shared/build/
 /shared/build/classes/kotlin/iosSimulatorArm64/main/klib/
 /shared/build/classes/kotlin/jvm/main/
+/iosApp/Configuration/Config.xcconfig
