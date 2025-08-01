@@ -153,3 +153,10 @@ data class Repositories(
     val items: List<Repository>
 )
 
+@Serializable
+data class SharedMarker(
+    val latitude: Double,
+    val longitude: Double,
+    val snippet: String,
+    val title: String,
+)
